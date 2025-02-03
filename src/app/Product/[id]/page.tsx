@@ -3,14 +3,18 @@ import { urlFor } from "@/sanity/lib/image";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-
-
-interface ProductPageProps {
-    params: { id: string };
+interface Product {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    category: string;
+    image: any;
 }
 
-
-
+interface ProductPageProps {
+    params: { id?: string }; // Make id optional
+}
 
 export default async function ProductPage({ params }: ProductPageProps) {
     if (!params?.id) {
