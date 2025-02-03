@@ -3,25 +3,23 @@ import { urlFor } from "@/sanity/lib/image";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+interface Product {
+    name: string;
+    price: number;
+    description: string;
+    category: string;
+    image: any;
+    slug: string;
+    stockLevel: number;
+    discountPercentage: number;
+}
+
 export default async function ProductPage({ params }: { params: { id: string } }) {
-    if (!params || !params.id) {
+    if (!params?.id) {
         return notFound();
     }
 
-
-
-
-    const query = `*[_type == 'product' && id == $id]{
-        name,
-        price,
-        description,
-        category,
-        image,
-        slug,
-        stockLevel,
-        discountPercentage,
-        _type
-    }[0]`;
+    const query = `*[_type == "product" && id == $id][0]`;
 
     try {
         const product: Product | null = await client.fetch(query, { id: params.id });
@@ -56,7 +54,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                             </li>
                             <li className="flex gap-4">
                                 <span className="font-semibold">Product Price:</span>
-                                <span className="font-medium">{product.price}</span>
+                                <span className="font-medium">${product.price}</span>
                             </li>
                             <li className="flex gap-4">
                                 <span className="font-semibold">Category:</span>
