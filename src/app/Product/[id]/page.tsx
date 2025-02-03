@@ -3,18 +3,11 @@ import { urlFor } from "@/sanity/lib/image";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-interface Product {
-    name: string;
-    price: number;
-    description: string;
-    category: string;
-    image: any;
-    slug: string;
-    stockLevel: number;
-    discountPercentage: number;
+interface ProductPageProps {
+    params: { id: string };
 }
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
+export default async function ProductPage({ params }: ProductPageProps) {
     if (!params?.id) {
         return notFound();
     }
@@ -22,7 +15,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
     const query = `*[_type == "product" && id == $id][0]`;
 
     try {
-        const product: Product | null = await client.fetch(query, { id: params.id });
+        const product = await client.fetch(query, { id: params.id });
 
         if (!product) {
             return <h1>Product not found</h1>;
@@ -34,39 +27,24 @@ export default async function ProductPage({ params }: { params: { id: string } }
                     <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-200">
                         {product.image && (
                             <Image
-                                src={urlFor(product.image).url() || "/placeholder.svg"}
-                                alt={product.name || "Product Image"}
-                                width={400}
-                                height={800}
-                                className="w-full h-[600px] object-cover rounded-md"
+                                src={urlFor(product.image).url()}
+                                alt={product.name}
+                                width={500}
+                                height={500}
+                                className="rounded-lg"
                             />
                         )}
                     </div>
                     <div>
-                        <ul className="space-y-4">
-                            <li className="flex gap-4">
-                                <span className="font-bold">Product Name:</span>
-                                <span className="font-medium">{product.name}</span>
-                            </li>
-                            <li className="flex gap-4">
-                                <span className="font-semibold">Description:</span>
-                                <span className="font-medium">{product.description}</span>
-                            </li>
-                            <li className="flex gap-4">
-                                <span className="font-semibold">Product Price:</span>
-                                <span className="font-medium">${product.price}</span>
-                            </li>
-                            <li className="flex gap-4">
-                                <span className="font-semibold">Category:</span>
-                                <span className="font-medium">{product.category}</span>
-                            </li>
-                        </ul>
+                        <h1 className="text-2xl font-bold">{product.name}</h1>
+                        <p className="text-gray-600">{product.description}</p>
+                        <p className="text-lg font-semibold text-blue-600">${product.price}</p>
                     </div>
                 </div>
             </div>
         );
     } catch (error) {
         console.error("Error fetching product:", error);
-        return <h1>Error loading product</h1>;
+        return <h1>Something went wrong</h1>;
     }
 }
